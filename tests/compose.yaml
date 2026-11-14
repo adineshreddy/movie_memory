@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: movie_memory_test
+      POSTGRES_PASSWORD: movie_memory_test
+      POSTGRES_DB: movie_memory_test
+    ports:
+      - "127.0.0.1::5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "movie_memory_test", "-d", "movie_memory_test"]
+      interval: 1s
+      timeout: 3s
+      retries: 20

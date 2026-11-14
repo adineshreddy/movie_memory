@@ -11,6 +11,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
+    "test": "node tests/run.mjs backend",
+    "test:e2e": "node tests/run.mjs browser",
     "postinstall": "prisma generate",
     "db:migrate": "prisma migrate deploy"
   },
