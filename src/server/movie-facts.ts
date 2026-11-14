@@ -22,8 +22,10 @@ export async function getMovieFact(userId: string) {
   if (!movie) return null;
 
   const db = getDb();
+  let source: ReturnType<typeof getFactSource> | undefined;
   try {
     const activeSource = getFactSource();
+    source = activeSource;
     const latestFact = await findLatestFact(db.movieFact, movie.id, activeSource);
     if (latestFact && isFactFresh(latestFact.createdAt)) return latestFact;
 
@@ -52,7 +54,10 @@ export async function getMovieFact(userId: string) {
       timeout: 20_000,
     });
   } catch (error) {
-    if (error instanceof FactGenerationError) return null;
+    if (error instanceof FactGenerationError) {
+      // The transaction has released the lock. A concurrent request may have saved a fact.
+      return source ? findLatestFact(db.movieFact, movie.id, source) : null;
+    }
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2028") return null;
 
